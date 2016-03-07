@@ -291,7 +291,3 @@ class DomainName
   end
 end
 
-# Short hand for DomainName.new().
-def DomainName(hostname)
-  DomainName.new(hostname)
-end

@@ -142,7 +142,7 @@ class TestDomainName < Test::Unit::TestCase
       ["abc.def.foo.com", "ABC.def.FOO.com", 0],
       ["abc.def.foo.com", "bar.com", nil],
     ].each { |x, y, v|
-      dx, dy = DomainName(x), DomainName(y)
+      dx, dy = DomainName.new(x), DomainName.new(y)
       [
         [dx, y, v],
         [dx, dy, v],
@@ -244,20 +244,20 @@ class TestDomainName < Test::Unit::TestCase
         ['a.b.city.sapporo.jp', false],
       ],
     }.each_pair { |host, pairs|
-      dn = DomainName(host)
+      dn = DomainName.new(host)
       assert_equal(true, dn.cookie_domain?(host.upcase, true),     dn.to_s)
       assert_equal(true, dn.cookie_domain?(host.downcase, true),   dn.to_s)
       assert_equal(false, dn.cookie_domain?("www." << host, true), dn.to_s)
       pairs.each { |domain, expected|
         assert_equal(expected, dn.cookie_domain?(domain),             "%s - %s" % [dn.to_s, domain])
-        assert_equal(expected, dn.cookie_domain?(DomainName(domain)), "%s - %s" % [dn.to_s, domain])
+        assert_equal(expected, dn.cookie_domain?(DomainName.new(domain)), "%s - %s" % [dn.to_s, domain])
       }
     }
   end
 
   should "parse IPv4 addresseses" do
     a = '192.168.10.20'
-    dn = DomainName(a)
+    dn = DomainName.new(a)
     assert_equal(a, dn.hostname)
     assert_equal(true, dn.ipaddr?)
     assert_equal(IPAddr.new(a), dn.ipaddr)
@@ -274,7 +274,7 @@ class TestDomainName < Test::Unit::TestCase
     a = '2001:200:dff:fff1:216:3eff:feb1:44d7'
     b = '2001:0200:0dff:fff1:0216:3eff:feb1:44d7'
     [b, b.upcase, "[#{b}]", "[#{b.upcase}]"].each { |host|
-      dn = DomainName(host)
+      dn = DomainName.new(host)
       assert_equal("[#{a}]", dn.uri_host)
       assert_equal(a, dn.hostname)
       assert_equal(true, dn.ipaddr?)
@@ -294,9 +294,9 @@ class TestDomainName < Test::Unit::TestCase
       %w[www.sub.example.local sub.example.local example.local local],
       %w[www.sub.example.com sub.example.com example.com com],
     ].each { |domain, *superdomains|
-      dn = DomainName(domain)
+      dn = DomainName.new(domain)
       superdomains.each { |superdomain|
-        sdn = DomainName(superdomain)
+        sdn = DomainName.new(superdomain)
         assert_equal sdn, dn.superdomain
         dn = sdn
       }
@@ -305,7 +305,7 @@ class TestDomainName < Test::Unit::TestCase
   end
 
   should "have idn methods" do
-    dn = DomainName("金八先生.B組.3年.日本語ドメイン名Example.日本")
+    dn = DomainName.new("金八先生.B組.3年.日本語ドメイン名Example.日本")
 
     assert_equal "xn--44q1cv48kq8x.xn--b-gf6c.xn--3-pj3b.xn--example-6q4fyliikhk162btq3b2zd4y2o.xn--wgv71a", dn.hostname
     assert_equal "金八先生.b組.3年.日本語ドメイン名example.日本", dn.hostname_idn
